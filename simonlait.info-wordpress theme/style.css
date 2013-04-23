@@ -261,3 +261,31 @@ a img.aligncenter {
     margin: 0;
     padding: 0 4px 5px;
 }
+
+@media all and (min-width: 480px) and (max-width: 1024px) and (orientation:landscape) {
+	/* iPad CSS rules here */
+	.theContent img, .teaser-image-post {
+		display:none;
+	}
+}
+@media all and (min-width: 480px) and (max-width: 1024px) and (orientation:portrait) {
+	/* iPad CSS rules here */
+	.theContent img, .teaser-image-post, #sidebar {
+		display:none;
+	}
+	.content {
+		width:100%;
+	}
+}
+@media all and (max-width: 480px) {
+	.theContent img, .teaser-image-post, #sidebar {
+		display:none;
+	}
+	.content {
+		width:100%;
+	}
+    /* iPhone CSS rules here */
+	nav {
+		display:none;
+	}
+}
