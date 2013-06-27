@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Tooltip Example</title>
+	<style>
+		.tooltip-box {
+			position:absolute;
+			background-color:rgb(0,0,0);
+			background-color:rgba(0,0,0,0.8);
+			padding:5px;
+			color:#fff;
+			display:inline-block;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<a href="#" class="tooltip" title="This is my tooltip text">Hover over me for the tootip</a>
+	</div>
+
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
+	<script>
+	$(function() {
+		$('a.tooltip').on({'mouseenter':function() {
+			var ele = $(this), title = ele.attr('title');
+			$('<div class="tooltip-box">' + title + '</div>').appendTo('body');
+			ele.data('title', title).prop('title', null);
+		},'mousemove':function(e) {
+			$('.tooltip-box').css({ 'left': (e.clientX + 20) + 'px','top': (e.clientY + 10) + 'px'});
+		},'mouseleave':function() {
+			var $ele = $(this);
+			$('.tooltip-box').remove();
+			$ele.attr('title', $ele.data('title'));
+		}
+		});
+	});
+	
+	
+	</script>
+</body>
+</html>
