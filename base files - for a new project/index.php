@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8">
 
-  <title>Premium WordPress Themes | Wedding WordPress Theme</title>
+  <title></title>
   <meta name="description" content="The HTML5 Herald">
   <meta name="author" content="ThemeName">
 
