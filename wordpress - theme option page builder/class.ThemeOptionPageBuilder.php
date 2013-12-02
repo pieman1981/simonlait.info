@@ -1,5 +1,14 @@
 <?php
-
+/**
+ * Class to create option pages
+ *
+ * This class is developed to make adding theme option pages to a theme simple
+ * 
+ * @copyright 2013 Simon Lait
+ * @version Release 1.0
+ * @link https://github.com/pieman1981/simonlait.info/tree/master/wordpress%20-%20theme%20option%20page%20builder
+ * @since Class available since Release 1.0
+ */
 class ThemeOptionPageBuilder {
 	
 	/* Menu Builder */
@@ -36,10 +45,18 @@ class ThemeOptionPageBuilder {
 	
 	private $tabs;
 	
+	/**
+	 * Add tabs to the option page
+	 *
+	 * @param  Array  $tabs  An array of tabs. Key is tab URL, value is tab text
+	 */
 	public function addTabs( $tabs = array() ) {
 		$this->tabs = $tabs;
 	}
 	
+	/**
+	 * Clear all form elements / setting sections before building the page
+	 */
 	public function clear_form_element() {
 		unset($this->setting_sections);
 		unset($this->settings_fields);
@@ -47,6 +64,16 @@ class ThemeOptionPageBuilder {
 		$this->settings_fields = array();
 	}
 	
+	/**
+	 * Construct function to create the menu item details
+	 *
+	 * @param  String  $form_page_title  Page title for new options page
+	 * @param  String  $form_menu_title  Menu title for new options page
+	 * @param  String  $form_menu_capability  Form menu capability
+	 * @param  String  $form_menu_slug  URL for the new option page
+	 * @param  Boolean $option_page  Standard theme option page under appearance tab, or a bespoke page
+	 * @param  Integer $menu_position  Menu position if not a standard theme option page
+	 */
 	public function construct($form_page_title='',$form_menu_title='',$form_menu_capability='',$form_menu_slug='', $option_page = true, $menu_position = 0) {
 		$this->form_page_title = $form_page_title;
 		$this->form_menu_title = $form_menu_title;
@@ -58,13 +85,15 @@ class ThemeOptionPageBuilder {
 		add_action( 'admin_menu', array( $this, 'create_options_menu' ) );
 	}
 	
-	/* Create the item on the admin navigation */
+	/**
+	 *  Create the item on the admin navigation (appearance menu or bespoke menu)
+	 */
 	public function create_options_menu() {
 		if ($this->option_page) {
-			add_theme_page( $this->form_page_title,	
-						$this->form_menu_title,
-						$this->form_menu_capability,
-						$this->form_menu_slug,
+			add_theme_page( $this->form_page_title,	//Page title
+						$this->form_menu_title, //Menu title
+						$this->form_menu_capability, //Capability
+						$this->form_menu_slug, //Slug
 						array( $this, 'output_options_page' )
 					);
 		}
@@ -81,7 +110,9 @@ class ThemeOptionPageBuilder {
 		}
 	}
 	
-	/* Output the HTML */
+	/**
+	 *  Create the HTML for the options page
+	 */
 	public function output_options_page() {
 	?>
 		<div class="wrap">
@@ -111,7 +142,13 @@ class ThemeOptionPageBuilder {
 	<?php
 	}
 	
-	//add a settings section to the form
+	/**
+	 *  Add a settings section to the options page
+	 *
+	 * @param  String  $set_tab_id  Settings Tab ID
+	 * @param  String  $section_header_text  Head text for the section
+	 * @param  String  $section_para_text  Paragraph text for the section
+	 */
 	public function add_settings_section( $set_tab_id = '', $section_header_text = '', $section_para_text = '' ) {
 		$section_options = array( 'header' => $section_header_text, 'para' => $section_para_text );
 		$this->options_name = $set_tab_id . '_theme_options';
@@ -119,11 +156,19 @@ class ThemeOptionPageBuilder {
 		$this->setting_sections[$this->settings_sections_name] = $section_options;
 	}
 	
+	/**
+	 *  Redundant, can't find a way to make this work
+	 */
 	public function show_section_text() {
 		echo '<p></p>';
 	}
 	
-	//add a form element to a section 
+	/**
+	 *  Add a form element to a settings section
+	 *
+	 * @param  String  $ele_label  Label text
+	 * @param  Array  $args  An array of options relating to the input field
+	 */
 	public function add_form_element( $ele_label = '', $args = array() ) {
 		$ele_options = array( 'label' => $ele_label, 'args' => $args);
 		if ( isset($args['id']) ) {
@@ -131,7 +176,11 @@ class ThemeOptionPageBuilder {
 		}
 	}
 	
-	//show an input type
+	/**
+	 *  Show an input field on the options page
+	 *
+	 * @param  Array  $args  An array of options relating to the input field
+	 */
 	function show_section_form( $args ) {
 		extract( wp_parse_args( $args, $this->defaults ));  
 		$options = get_option( $this->options_name );
@@ -140,22 +189,22 @@ class ThemeOptionPageBuilder {
 		$placeholder = ($std ? $std : '' );
 		
 		switch ( $type ) {  
-			case 'file':
+			case 'file': //show file input type
 				echo "<input class='regular-text$field_class' type='file' id='$id' name='$id' value='$default' />";  
 				echo ($desc != '') ? "<br /><span class='description'>$desc</span>" : "";  
 				echo ($default != '') ? "<br /><img src='$default' class='image-100'/>" : "";
 			break;
 			
-			case 'text':  
+			case 'text':  //show text input type
 				$default = stripslashes( $default );  
 				$default = esc_attr( $default );  
 				echo "<input size='$size' class='regular-text$field_class' type='text' id='$id' name='" . $this->options_name . "[$id]' placeholder='$placeholder' value='$default' />";  
 				echo ($desc != '') ? "<br /><span class='description'>$desc</span>" : "";  
 			break;  
 			
-			case 'multi-text':  
+			case 'multi-text':  //show multi text input type
 				foreach($choices as $item) {  
-					$item = explode("|",$item); // cat_name|cat_slug|Default 
+					$item = explode("|",$item); // Label|ID|Placehoder
 					$item[0] = esc_html($item[0]);  
 					$value = '';
 					if (!empty($options[$id])) {  
@@ -165,20 +214,20 @@ class ThemeOptionPageBuilder {
 							}  
 						}  
 					} 
-					$placeholder = $item[2]; 
+					$placeholder = (isset($item[2]) ? $item[2] : ''); 
 					echo "<span class='multi-span'>$item[0]:</span> <input size='$size' class='$field_class' type='text' id='$id|$item[1]' name='" . $this->options_name . "[$id][$item[1]]' placeholder='$placeholder' value='$value' /><br/>";  
 				}  
 				echo ($desc != '') ? "<span class='description'>$desc</span>" : "";  
 			break;  
 			
-			case 'textarea':  
+			case 'textarea':  //show textarea input type
 				$options[$id] = stripslashes($options[$id]);  
 				$options[$id] = esc_html( $options[$id]);  
 				echo "<textarea class='textarea$field_class' type='text' id='$id' name='" . $this->options_name . "[$id]' rows='5' cols='30' placeholder='$placeholder'>$default</textarea>";  
 				echo ($desc != '') ? "<br /><span class='description'>$desc</span>" : "";           
 			break;  
 			
-			case 'select':  
+			case 'select':  //show select input type
 				echo "<select id='$id' class='select$field_class' name='" . $this->options_name . "[$id]'>";  
 					foreach($choices as $item) {  
 						$value  = esc_attr($item);  
@@ -191,9 +240,9 @@ class ThemeOptionPageBuilder {
 				echo ($desc != '') ? "<br /><span class='description'>$desc</span>" : "";   
 			break; 
 			
-			case 'checkbox': 
+			case 'checkbox': //show checkbox input type
 				foreach($choices as $item) {  
-					$itemEx = explode("|",$item);  
+					$itemEx = explode("|",$item);  //label|value
 					$item = esc_html($itemEx[0]);  
 					$value = esc_attr($itemEx[1]); 				
 					$checked = '';  
@@ -212,9 +261,9 @@ class ThemeOptionPageBuilder {
 				echo ($desc != '') ? "<br /><span class='description'>$desc</span>" : "";
 			break;  
 			
-			case 'radio': 
+			case 'radio': //show radio input type
 				foreach($choices as $item) {  
-					$itemEx = explode("|",$item);  
+					$itemEx = explode("|",$item);  //label|value
 					$item = esc_html($itemEx[0]);  
 					$value = esc_attr($itemEx[1]); 				
 					$checked = '';  
@@ -231,11 +280,17 @@ class ThemeOptionPageBuilder {
 		}
 	}
 	
+	/**
+	 *  Create the option page form
+	 */
 	public function create_options_form() {
-		add_action( 'admin_init', array( $this, 'create_form_init' ) );
+		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'after_setup_theme', array( $this, 'create_file_options' ) );
 	}
 	
+	/**
+	 *  Fix for problems with file input types
+	 */
 	public function create_file_options() {
 		if ( sizeof ( $this->settings_fields) ) { 
 			$add_options = array();
@@ -249,7 +304,10 @@ class ThemeOptionPageBuilder {
 		};
 	}
 	
-	public function create_form_init() {
+	/**
+	 *  Loop over each tab and register the settings, add the sections, and add form elements
+	 */
+	public function register_settings() {
 		foreach ($this->tabs as $name => $tab) {
 			$tab_name = $name . '_theme_options';
 			register_setting( 
@@ -287,7 +345,12 @@ class ThemeOptionPageBuilder {
 		};
 	}
 	
-	//validate inputs ready tosave in db
+	/**
+	 *  Validate inputs ready to save in db
+	 *
+	 * @param  Array  $input  All raw input values submitted 
+	 * @returns Array $valid_input An array of valid value after being validated
+	 */
 	function form_validate_options ( $input ) {
 		$valid_input = array();
 		$field_elements = $this->settings_fields;
@@ -389,7 +452,7 @@ class ThemeOptionPageBuilder {
 									}  
 										
 									// register error  
-									if(is_email($input[$option['args']['id']])== FALSE || $input[$option['args']['id']] == '') {  
+									if (is_email($input[$option['args']['id']])== FALSE || $input[$option['args']['id']] == '') {  
 											add_settings_error(  
 													$option['args']['id'], // setting title  
 													$this->options_name . '_txt_email_error', // error ID  
